@@ -15,7 +15,6 @@ app.logger.setLevel(logging.DEBUG)
 
 
 buffer = []
-done_ok = False
 dest_vol = '/Volumes/video'
 dest_vol = '/Users/phubbard/dev/ytdl-web'
 # TODO Dropdown of choices
@@ -57,10 +56,9 @@ def save_files():
 def my_hook(d):
     # Event hook - status seems to be finished or downloading
     if d['status'] == 'finished':
-        done_ok = True
         stats = f"{d['_total_bytes_str']} {d['filename']}"
         app.logger.info(f"Done OK: {stats}")
-        buffer.append(f'Done ok={done_ok} {stats}')
+        buffer.append(f'Done {stats}')
     elif d['status'] == 'error':
         app.logger.error(f"==> {str(d)}")
         buffer.append(str(d))
@@ -73,7 +71,6 @@ ydl_opts = {
 # Display the to-be-downloaded page
 @app.route('/', methods=['GET'])
 def index():
-    done_ok = False
     buffer = []
     return render_template('index.html')
 
