@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Results</title>
+</head>
+<body>
+
+<h1>Results</h1>
+URL was {{ url }}
+
+{% if status is true %}
+    <h2 style="color:green">Done OK</h2>
+{% else %}
+    <h2 style="color:red">Error</h2>
+{% endif %}
+
+<a href="{{ restart_url }}">click here to go again</a>.
+
+<h3>Messages</h3>
+<pre>
+    {% for item in messages %}
+        {{ item }}
+    {% endfor %}
+</pre>
+</body>
+</html>
