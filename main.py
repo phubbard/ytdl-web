@@ -80,6 +80,7 @@ ydl_opts = {
 # Display the to-be-downloaded page
 @app.route('/', methods=['GET'])
 def index():
+    global buffer
     buffer = []
     return render_template('index.html', dirs=make_dirlist(dest_vol), default_dir=default_dir)
 
@@ -108,4 +109,4 @@ def submit():
 
 if __name__ == '__main__':
     app.logger.debug(make_dirlist(dest_vol))
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
