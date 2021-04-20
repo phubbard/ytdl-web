@@ -5,6 +5,17 @@
 <form action="/submit" method="post">
   <label for="vidlink">Enter the URL you want retrieved:</label>
   <input type="url" id="vidlink" name="vidlink" size="80"><br><br>
+  <label for="destination">Destination directory:</label>
+  <select id="destination" name="destination">
+    {% for directory in dirs %}
+      {% if directory == default_dir %}
+         <option value="{{directory}}" selected>{{directory}} (default)</option>
+      {% else %}
+        <option value="{{directory}}">{{directory}}</option>
+      {% endif %}
+    {% endfor %}
+  </select>
+  <br><br>
   <input type="reset" value="Reset">
   <input type="submit" value="Submit">
 </form>
