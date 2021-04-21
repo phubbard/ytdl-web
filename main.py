@@ -44,24 +44,6 @@ def make_dirlist(parent):
     return sorted(filtered_dirs)
 
 
-def save_files(dest_dir=default_dir):
-    # Given file(s) in CWD, move them all into the destination directory.
-    # If error, throws OSError or shutil.Error
-    filenames = sorted(Path('.').glob('*'))
-    if len(filenames) == 0:
-        app.logger.error('No files found to move!')
-        return
-
-    dest_path = Path(dest_vol, dest_dir)
-    if dest_path.exists() and dest_path.is_dir():
-        app.logger.debug(f'Destination looks OK, {len(filenames)} file(s) found')
-        for file in filenames:
-            app.logger.info(f"Moving {file} to {dest_path}")
-            shutil.move(file, dest_path)
-    else:
-        app.logger.error(f'Unable to use destination directory {dest_path}')
-
-
 def my_hook(d):
     # Event hook - status seems to be finished or downloading
     if d['status'] == 'finished':
@@ -72,6 +54,7 @@ def my_hook(d):
         app.logger.error(f"==> {str(d)}")
         buffer.append(str(d))
 
+# YTDL options - quality, etc. Defaults work here, so just add hooks.
 ydl_opts = {
     'logger': MyLogger(),
     'progress_hooks': [my_hook],
@@ -90,17 +73,20 @@ def index():
 def submit():
     url = request.form['vidlink']
     dest_dir = request.form['destination']
-    app.logger.info(f"Starting on {url} to {dest_dir}")
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        os.chdir(tmpdirname)
+
+    dest_path = Path(dest_vol, dest_dir)
+    cur_dir = os.getcwd()
+    try:
+        os.chdir(dest_path)
+        app.logger.debug(f'Destination looks OK, starting on {url}')
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
-        try:
-            save_files(dest_dir)
-            done_ok = True
-        except shutil.Error as err:
-            done_ok = False
-            buffer.append(str(err))
+        done_ok = True
+    except OSError as ose:
+        done_ok = False
+        buffer.append(f'Error in target directory {str(ose)}')
+    finally:
+        os.chdir(cur_dir)
 
     app.logger.info(f'Done {done_ok}')
     return render_template('results.html', messages=buffer, status=done_ok,
