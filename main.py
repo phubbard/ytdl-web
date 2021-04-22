@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 import logging
 import os
 from pathlib import Path
