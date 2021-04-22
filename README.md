@@ -10,7 +10,7 @@ around YTDL, with a bit of usefulness in the 'build list of target directories' 
 
 Works as intended, but
 - One file at a time, and the page doesn't return until complete.
-- No CSS at all. Pages are ugly.
+- Basic Bootstrap v4 CSS, explicitly _without_ JS. Input validation is most-basic, but looks OK.
 - No file management, I expect clutter to accumulate.
 
 ### Next steps
@@ -18,10 +18,9 @@ Works as intended, but
 - Productionize it - WSGI, debug off, reverse proxy. Cannot currently be exposed to the internet.
 - Find a way to push results as they happen - or at least a spinner
 - Some sort of temp directory with automatic cleanup would be cool.
-- CSS. Even most-basic. Media queries for phone FTW.
 - Put directories into config file.
 - Multiple concurrent downloads - hmm. Async? Threads? Websockets to push updates?
-
+- Try [v2 Flask beta?](https://www.reddit.com/r/Python/comments/msbt3p/flask_20_is_coming_please_help_us_test/)
 
 ## Installation
 
@@ -34,16 +33,26 @@ Works as intended, but
 	source venv/bin/activatate
 	python main.py
 
+## Maintain it
+
+TBD - YTDL has periodic updates, need to determine how to upgrade the library in place.
+
 ## Tools and libraries
 
-[Flask](https://flask.palletsprojects.com/en/1.1.x/) for fastest dev or [fastapi](https://fastapi.tiangolo.com/) to learn?
-
-FastAPI lacks the built-in templates and html support, so revert back to it.
+FastAPI lacks the built-in templates and html support, so Flask is perfect. We also, of course, use 
+the Python API for youtube-dl.
 
 ## Notes
 
 You have to disable the Intuit package index to install - it 404s the youtube-dl package. See ~/.pip/pip.conf
 
 ## Docs
-Looks like [it's easily embeddable](https://github.com/ytdl-org/youtube-dl#embedding-youtube-dl). Nice.
+
+- [Flask](https://flask.palletsprojects.com/en/1.1.x/) for fastest dev
+- [fastapi](https://fastapi.tiangolo.com/) to learn? No, need HTML/CSS/templates
+- [YTDL is easily embeddable](https://github.com/ytdl-org/youtube-dl#embedding-youtube-dl). Nice.
+- CSS styles from [Bootstrap v4](https://getbootstrap.com/docs/5.0/forms/overview/)
+- Film icon from [here](https://icons.getbootstrap.com/icons/film/)
+- Favicon from [here](https://www.favicon.cc/?action=icon&file_id=935559)
+- Form styled using [this documentation](https://getbootstrap.com/docs/5.0/forms/overview/)
 
