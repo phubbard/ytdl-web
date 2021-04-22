@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
+from configparser import SafeConfigParser
 import logging
 import os
-import shutil
 from pathlib import Path
-import tempfile
+import socket
 
 from flask import Flask, make_response, request, render_template, redirect, url_for
 import youtube_dl
@@ -14,12 +14,16 @@ app = Flask('ytdl-web')
 app.logger.setLevel(logging.DEBUG)
 
 
+# Global message buffer - see MyLogger
 buffer = []
-dest_vol = '/Volumes/video'
-dest_vol = '/Users/phubbard/dev/ytdl-web'
-# TODO Dropdown of choices
-#dest_dir = 'New'
-default_dir = 'tmp'
+
+# Load per-host config froom config file
+hostname = socket.gethostname()
+config = SafeConfigParser()
+config.read("config.ini")
+dest_vol = config[hostname]['dest_vol']
+default_dir = config[hostname]['dest_default']
+
 
 class MyLogger(object):
     def debug(self, msg):
@@ -94,5 +98,6 @@ def submit():
 
 
 if __name__ == '__main__':
-    app.logger.debug(make_dirlist(dest_vol))
+    app.logger.info(f'Configuration: {socket.gethostname()} {dest_vol} {default_dir}')
+    app.logger.debug(f'Directories: {make_dirlist(dest_vol)}')
     app.run(debug=True, host='0.0.0.0')

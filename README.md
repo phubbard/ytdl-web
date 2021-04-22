@@ -14,7 +14,7 @@ Works as intended, but
 - No file management, I expect clutter to accumulate.
 
 ### Next steps
-
+- For iOS, add manifest or whatever so it looks a proper home screen icon.
 - Productionize it - WSGI, debug off, reverse proxy. Cannot currently be exposed to the internet.
 - Find a way to push results as they happen - or at least a spinner
 - Some sort of temp directory with automatic cleanup would be cool.
