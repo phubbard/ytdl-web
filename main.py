@@ -1,28 +1,45 @@
 from __future__ import unicode_literals
 from configparser import ConfigParser
+from dataclasses import dataclass
 import logging
+import multiprocessing
 import os
 from pathlib import Path
 import socket
+import sys
 
 from flask import Flask, make_response, request, render_template, redirect, url_for
 import youtube_dl
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s %(message)s')
 
-app = Flask('ytdl-web')
+app = Flask('ytdl-web-smp')
 app.logger.setLevel(logging.DEBUG)
 
+@dataclass
+class Download:
+    # Class for download info/sync across processes
+    messages: list
+    progress: int = 0
+    size_bytes: int = 0
+    fetched_bytes: int = 0
+
+manager = multiprocessing.managers.SyncManager()
+results = manager.dict()
 
 # Global message buffer - see MyLogger
 buffer = []
 
 # Load per-host config froom config file
 hostname = socket.gethostname()
-config = SafeConfigParser()
+config = ConfigParser()
 config.read("config.ini")
-dest_vol = config[hostname]['dest_vol']
-default_dir = config[hostname]['dest_default']
+try:
+    dest_vol = config[hostname]['dest_vol']
+    default_dir = config[hostname]['dest_default']
+except KeyError:
+    app.logger.error(f"Add a {socket.gethostname()} section in config.ini")
+    sys.exit(1)
 
 
 class MyLogger(object):

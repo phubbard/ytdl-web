@@ -53,6 +53,7 @@ You have to disable the Intuit package index to install - it 404s the youtube-dl
 - [YTDL is easily embeddable](https://github.com/ytdl-org/youtube-dl#embedding-youtube-dl). Nice.
 - CSS styles from [Bootstrap v4](https://getbootstrap.com/docs/5.0/forms/overview/)
 - Film icon from [here](https://icons.getbootstrap.com/icons/film/)
+- Reset icon from [here](https://icons.getbootstrap.com/icons/x-circle/)  
 - Favicon from [here](https://www.favicon.cc/?action=icon&file_id=935559)
 - Form styled using [this documentation](https://getbootstrap.com/docs/5.0/forms/overview/)
 
