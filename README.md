@@ -9,17 +9,18 @@ around YTDL, with a bit of usefulness in the 'build list of target directories' 
 ## Current status
 
 Works as intended, but
-- One file at a time, and the page doesn't return until complete.
+- Downloads run in the background, but there's no way to see if the failed or finished
 - Basic Bootstrap v4 CSS, explicitly _without_ JS. Input validation is most-basic, but looks OK.
 - No file management, I expect clutter to accumulate.
+- Utterly insecure - no input validation, so internal-network use only.
 
 ### Next steps
 - For iOS, add manifest or whatever so it looks a proper home screen icon.
 - Productionize it - WSGI, debug off, reverse proxy. Cannot currently be exposed to the internet.
 - Find a way to push results as they happen - or at least a spinner
 - Some sort of temp directory with automatic cleanup would be cool.
-- Put directories into config file.
-- Multiple concurrent downloads - hmm. Async? Threads? Websockets to push updates?
+- ~~Put directories into config file.
+- ~~Multiple concurrent downloads - hmm. Async? Threads? Websockets to push updates?
 - Try [v2 Flask beta?](https://www.reddit.com/r/Python/comments/msbt3p/flask_20_is_coming_please_help_us_test/)
 
 ## Installation
@@ -41,10 +42,6 @@ TBD - YTDL has periodic updates, need to determine how to upgrade the library in
 
 FastAPI lacks the built-in templates and html support, so Flask is perfect. We also, of course, use 
 the Python API for youtube-dl.
-
-## Notes
-
-You have to disable the Intuit package index to install - it 404s the youtube-dl package. See ~/.pip/pip.conf
 
 ## Docs
 
