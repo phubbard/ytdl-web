@@ -154,10 +154,3 @@ def get_all_jobs(start: int, limit: int, cursor=None):
     dicts = [dict(x) for x in rows]
     return dicts
 
-
-##########################
-# Reuse module as way to create a new, empty DB with tables
-if __name__ == '__main__':
-    make_database(False)
-
-
