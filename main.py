@@ -34,19 +34,25 @@ except KeyError:
 
 
 class MyLogger(object):
-    # TODO save job id for sqlite logger™
+    # Save job id for sqlite logger
     def __init__(self, job_id):
         self.job_id = job_id
         super(MyLogger, self).__init__()
 
+    def _clean_str(self, msg):
+        # Need to strip out newlines/CR/LF from strings - the progress is multiline
+        a = msg.replace('\n', ' ')
+        return a.strip()
+
     def debug(self, msg):
-        save_log_message(self.job_id, f'DBG {msg}')
+        # TODO pull download percentage out for progress indicator?
+        save_log_message(self.job_id, f'DBG {self._clean_str(msg)}')
 
     def warning(self, msg):
-        save_log_message(self.job_id, f'WARN {msg}')
+        save_log_message(self.job_id, f'WARN {self._clean_str(msg)}')
 
     def error(self, msg):
-        save_log_message(self.job_id, f'ERR {msg}')
+        save_log_message(self.job_id, f'ERR {self._clean_str(msg)}')
         # app.logger.error(msg)
 
 
@@ -60,7 +66,6 @@ def make_dirlist(parent):
 
 
 def worker(my_url: str, dest: Path, job_id: str):
-    # TODO move to sqlite
     cur_dir = os.getcwd()
     try:
         os.chdir(dest)
@@ -89,7 +94,6 @@ def poll_job(job_id):
     if job_info is None:
         return make_response(f'Job {job_id} not found', 404)
 
-    # FIXME 404 page if none
     url = job_info['url']
     status = job_info['status']
     dest_dir = job_info['dest_dir']
@@ -110,7 +114,6 @@ def submit():
     p.start()
     # send to new in-process page, job_id as key
     return redirect(f'/job/{job_id}')
-    # return render_template('bg.html', restart_url=url_for('index'))
 
 
 if __name__ == '__main__':
