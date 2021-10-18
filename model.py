@@ -5,26 +5,18 @@
 
 import functools
 import logging
-from pathlib import Path
 import sqlite3
 import time
 from uuid import uuid4
 
+from config import DB_PATH, LOG_TABLE, JOB_TABLE, JOB_STATES
+
+
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s %(message)s')
 log = logging.getLogger('model')
 
-# DB_DIR set by parent from configuration file
-DB_DIR = "/Users/phubbard/dev/ytdl-web"
-DB_NAME = "ytdl.sqlite"
-LOG_TABLE = "logs"
-JOB_TABLE = "jobs"
-JOB_STATES = ['NEW', 'RUNNING', 'DONE']
-
 
 def _get_db():
-    # We need absolute path for DB otherwise os.cwd breaks this
-    # Late binding needed here - set post-import at read of configuration file
-    DB_PATH = str(Path(DB_DIR) / DB_NAME)
     # See https://stackoverflow.com/questions/43691588/python-multiprocessing-write-the-results-in-the-same-file
     conn = sqlite3.connect(DB_PATH, isolation_level="EXCLUSIVE")
     # I want key:value pairs, not a plain tuple
