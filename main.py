@@ -6,9 +6,13 @@ import os
 from pathlib import Path
 import socket
 import sys
+from uuid import uuid4
 
 from flask import Flask, request, render_template, url_for
 import youtube_dl
+
+from model import save_log_message
+
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s %(message)s')
 
@@ -29,14 +33,19 @@ except KeyError:
 
 
 class MyLogger(object):
+    # TODO save job id for sqlite logger™
+    def __init__(self, job_id):
+        self.job_id = job_id
+        super(MyLogger, self).__init__()
+
     def debug(self, msg):
-        pass
+        save_log_message(self.job_id, f'DBG {msg}')
 
     def warning(self, msg):
-        pass
+        save_log_message(self.job_id, f'WARN {msg}')
 
     def error(self, msg):
-        pass
+        save_log_message(self.job_id, f'ERR {msg}')
         # app.logger.error(msg)
 
 
@@ -49,12 +58,13 @@ def make_dirlist(parent):
     return sorted(filtered_dirs)
 
 
-def worker(my_url: str, dest: Path):
+def worker(my_url: str, dest: Path, job_id: str):
+    # TODO move to sqlite
     cur_dir = os.getcwd()
     try:
         os.chdir(dest)
-        app.logger.debug(f'Destination looks OK, starting on {my_url}')
-        with youtube_dl.YoutubeDL({'logger': MyLogger()}) as ydl:
+        app.logger.debug(f'Destination looks OK, starting job{job_id} on {my_url}')
+        with youtube_dl.YoutubeDL({'logger': MyLogger(job_id)}) as ydl:
             ydl.download([my_url])
     except OSError as ose:
         app.logger.exception(ose)
@@ -71,11 +81,13 @@ def index():
 
 @app.route('/submit', methods=['POST'])
 def submit():
+    job_id = uuid4().hex
     url = request.form['vidlink']
     dest_dir = request.form['destination']
     dest_path = Path(dest_vol, dest_dir)
-    p = Process(target=worker, args=(url, dest_path))
+    p = Process(target=worker, args=(url, dest_path, job_id))
     p.start()
+    # TODO send to new in-process page, job_id as key
     return render_template('bg.html', restart_url=url_for('index'))
 
 
