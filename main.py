@@ -11,7 +11,8 @@ from uuid import uuid4
 from flask import Flask, request, render_template, url_for, redirect, make_response
 import youtube_dl
 
-from model import save_log_message, get_job, get_job_logs, get_next_job, save_new_job, update_job_status
+from model import save_log_message, get_job, get_job_logs, get_next_job, \
+    save_new_job, update_job_status, get_all_jobs
 
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s %(message)s')
@@ -85,7 +86,8 @@ def worker(my_url: str, dest: Path, job_id: str):
 @app.route('/', methods=['GET'])
 def index():
     # TODO add job list with clickable links
-    return render_template('index.html', dirs=make_dirlist(dest_vol), default_dir=default_dir)
+    job_list = get_all_jobs(0, 20)
+    return render_template('index.html', dirs=make_dirlist(dest_vol), default_dir=default_dir, job_list=job_list)
 
 
 # Display a single download job

@@ -145,6 +145,15 @@ def get_job_logs(job_id: str, cursor=None):
     return msgs
 
 
+@db_wrapper
+def get_all_jobs(start: int, limit: int, cursor=None):
+    # TODO add pagination
+    query = cursor.execute(f'SELECT * from {JOB_TABLE} ORDER BY timestamp DESC LIMIT {limit}')
+    rows = query.fetchall()
+    dicts = [dict(x) for x in rows]
+    return dicts
+
+
 #################################
 # TODO rewrite into unit tests using :memory: DB type
 if __name__ == '__main__':

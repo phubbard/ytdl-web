@@ -6,21 +6,30 @@ I see youtube and similar links all the time, and want to view them on the TV mi
 watching. This little app uses a home server with SMB connection to my NAS to save. Super basic web wrapper 
 around YTDL, with a bit of usefulness in the 'build list of target directories' logic and HTML.
 
+As of 10/18/2021, jobs and logging are saved into SQLite, enabling the addition of a polling/detail page, plus a table 
+of recent jobs on the home page. Much nicer!
+
 ## Current status
 
 Works as intended, but
-- Downloads run in the background, but there's no way to see if the failed or finished
+- Downloads run in the background~~, but there's no way to see if the failed or finished~~
 - Basic Bootstrap v4 CSS, explicitly _without_ JS. Input validation is most-basic, but looks OK.
 - No file management, I expect clutter to accumulate.
 - Utterly insecure - no input validation, so internal-network use only.
 
 ### Next steps
+- Add pagination to index table
+- Add intelligence to log display - collapse the middle if too long (accordion maybe)
+- Widen margins on log display
+- Add 'retry this download IFF rc != 0' kind of thing
+- Parse debug logs or API to include download bytes and percentage to poll/detail. Progress bar!
+- Move ad-hoc test code into proper unit tests.
 - For iOS, add manifest or whatever so it looks a proper home screen icon.
 - Productionize it - WSGI, debug off, reverse proxy. Cannot currently be exposed to the internet.
-- Find a way to push results as they happen - or at least a spinner
+- ~~Find a way to push results as they happen - or at least a spinner~~
 - Some sort of temp directory with automatic cleanup would be cool.
-- ~~Put directories into config file.
-- ~~Multiple concurrent downloads - hmm. Async? Threads? Websockets to push updates?
+- ~~Put directories into config file.~~
+- ~~Multiple concurrent downloads - hmm. Async? Threads? Websockets to push updates?~~
 - Try [v2 Flask beta?](https://www.reddit.com/r/Python/comments/msbt3p/flask_20_is_coming_please_help_us_test/)
 
 ## Installation

@@ -27,11 +27,12 @@
     </a>
 
     <h3>Messages</h3>
-    <pre class=".pre-scrollable">
         {% for item in job_logs %}
+        <samp>
             {{ item }}
+            <br>
+        </samp>
         {% endfor %}
-    </pre>
 </div>
 
 </body>
