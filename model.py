@@ -1,4 +1,4 @@
-#!/usr/share/bin/env python3
+#!/usr/bin/bin/env python3
 # pfh 10/15/2021
 # Data model for updated version - store jobs and logs in sqlite,
 # use separate workers to DL.
@@ -58,9 +58,9 @@ def db_wrapper(func):
 
 @db_wrapper
 def make_database(fake_record=False, cursor=None):
-    log.warning('Dropping tables')
-    cursor.execute(f'DROP TABLE {JOB_TABLE}')
-    cursor.execute(f'DROP TABLE {LOG_TABLE}')
+    # log.warning('Dropping tables')
+    # cursor.execute(f'DROP TABLE {JOB_TABLE}')
+    # cursor.execute(f'DROP TABLE {LOG_TABLE}')
     log.info('Jobs table')
     cursor.execute(f'''CREATE TABLE {JOB_TABLE}
                     (ID INTEGER PRIMARY KEY AUTOINCREMENT,
