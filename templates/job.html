@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     {% if status == 'RUNNING' %}
-        <meta http-equiv="refresh" content="10">
+        <meta http-equiv="refresh" content="15">
     {% endif %}
     <link href="/static/bootstrap.min.css" rel="stylesheet">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -18,12 +18,6 @@
         URL is <a href="{{ url }}">{{ url }}</a>, saving to {{ dest_dir }}
     </div>
 
-    <h3>Messages</h3>
-    <pre class=".pre-scrollable">
-        {% for item in job_logs %}
-            {{ item }}
-        {% endfor %}
-    </pre>
     <a class="btn btn-primary" href="{{ restart_url }}">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-film"
              viewBox="0 0 16 16">
@@ -31,6 +25,13 @@
         </svg>
         click here to go again
     </a>
+
+    <h3>Messages</h3>
+    <pre class=".pre-scrollable">
+        {% for item in job_logs %}
+            {{ item }}
+        {% endfor %}
+    </pre>
 </div>
 
 </body>

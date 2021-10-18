@@ -11,7 +11,7 @@ import time
 from uuid import uuid4
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s %(message)s')
-log = logging.getLogger('data model')
+log = logging.getLogger('model')
 
 # DB_DIR set by parent from configuration file
 DB_DIR = "/Users/phubbard/dev/ytdl-web"

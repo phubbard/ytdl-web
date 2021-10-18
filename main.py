@@ -64,7 +64,7 @@ def make_dirlist(parent):
     filtered_dirs = [x for x in all_dirs if not x.startswith('.')]
     return sorted(filtered_dirs)
 
-
+# TODO poll the DB for other new jobs
 def worker(my_url: str, dest: Path, job_id: str):
     cur_dir = os.getcwd()
     try:
@@ -84,6 +84,7 @@ def worker(my_url: str, dest: Path, job_id: str):
 # Display the to-be-downloaded page
 @app.route('/', methods=['GET'])
 def index():
+    # TODO add job list with clickable links
     return render_template('index.html', dirs=make_dirlist(dest_vol), default_dir=default_dir)
 
 
@@ -98,7 +99,10 @@ def poll_job(job_id):
     status = job_info['status']
     dest_dir = job_info['dest_dir']
     job_logs = get_job_logs(job_id)
-    return render_template('job.html', job_logs=job_logs, url=url, status=status, dest_dir=dest_dir)
+    restart_url = url_for('index')
+    return render_template('job.html', job_logs=job_logs,
+                           url=url, status=status, dest_dir=dest_dir,
+                           restart_url=restart_url)
 
 
 @app.route('/submit', methods=['POST'])
