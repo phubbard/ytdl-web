@@ -13,18 +13,20 @@ from uuid import uuid4
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s %(message)s')
 log = logging.getLogger('data model')
 
+# DB_DIR set by parent from configuration file
 DB_DIR = "/Users/phubbard/dev/ytdl-web"
 DB_NAME = "ytdl.sqlite"
 LOG_TABLE = "logs"
 JOB_TABLE = "jobs"
 JOB_STATES = ['NEW', 'RUNNING', 'DONE']
 
-DB_PATH = Path(DB_DIR) / DB_NAME
 
-# FIXME need absolute path for DB otherwise os.cwd breaks this
 def _get_db():
+    # We need absolute path for DB otherwise os.cwd breaks this
+    # Late binding needed here - set post-import at read of configuration file
+    DB_PATH = str(Path(DB_DIR) / DB_NAME)
     # See https://stackoverflow.com/questions/43691588/python-multiprocessing-write-the-results-in-the-same-file
-    conn = sqlite3.connect(str(DB_PATH), isolation_level="EXCLUSIVE")
+    conn = sqlite3.connect(DB_PATH, isolation_level="EXCLUSIVE")
     # I want key:value pairs, not a plain tuple
     # https://stackoverflow.com/questions/3300464/how-can-i-get-dict-from-sqlite-query
     conn.row_factory = sqlite3.Row

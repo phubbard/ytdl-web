@@ -27,6 +27,7 @@ config.read("config.ini")
 try:
     dest_vol = config[hostname]['dest_vol']
     default_dir = config[hostname]['dest_default']
+    DB_DIR = config[hostname]['db_dir']
 except KeyError:
     app.logger.error(f"Add a {socket.gethostname()} section in config.ini")
     sys.exit(1)
@@ -69,6 +70,7 @@ def worker(my_url: str, dest: Path, job_id: str):
             update_job_status(job_id, 'DONE', 0)
     except OSError as ose:
         app.logger.exception(ose)
+        update_job_status(job_id, 'DONE', -1)
     finally:
         os.chdir(cur_dir)
     app.logger.info(f"Worker done with {my_url}")

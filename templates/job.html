@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% if status == 'RUNNING' %}
+        <meta http-equiv="refresh" content="10">
+    {% endif %}
     <link href="/static/bootstrap.min.css" rel="stylesheet">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <title>Job status</title>
@@ -12,7 +15,7 @@
 <div class="container">
     <h2 style="...">Status is: {{status}}</h2>
     <div class="body">
-        URL is {{ url }}, saving to {{ dest_dir }}
+        URL is <a href="{{ url }}">{{ url }}</a>, saving to {{ dest_dir }}
     </div>
 
     <h3>Messages</h3>
