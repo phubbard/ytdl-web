@@ -149,31 +149,15 @@ def get_job_logs(job_id: str, cursor=None):
 def get_all_jobs(start: int, limit: int, cursor=None):
     # TODO add pagination
     query = cursor.execute(f'SELECT * from {JOB_TABLE} ORDER BY timestamp DESC LIMIT {limit}')
+    # TODO Extract this pattern into function?
     rows = query.fetchall()
     dicts = [dict(x) for x in rows]
     return dicts
 
 
-#################################
-# TODO rewrite into unit tests using :memory: DB type
+##########################
+# Reuse module as way to create a new, empty DB with tables
 if __name__ == '__main__':
     make_database(False)
-    # get_job()
-    job_id = str(uuid4().hex)
-    second_job_id = str(uuid4().hex)
-    for x in range(10):
-        save_log_message(job_id, f'for the {x}th time')
-        save_log_message(second_job_id, f'2nd job {x} along')
-    save_new_job(job_id, 'https://youtu.be/B9FzVhw8_bY', '/tmp')
-    rc = get_next_job()
-    assert(rc is not None)
-    assert(rc['job_id'] == job_id)
-    rc = get_next_job()
-    assert(rc is None)
-    update_job_status(job_id, 'DONE', 0)
 
-    rc = get_job(job_id)
-    assert(rc is not None)
-    rc = get_job_logs(job_id)
-    assert(len(rc) == 10)
-    # log.debug(rc)
+

@@ -38,6 +38,12 @@ class MyLogger(object):
     # Save job id for sqlite logger
     def __init__(self, job_id):
         self.job_id = job_id
+        self.filename = ''
+        self.downloaded_bytes = 0
+        self.total.bytes = 0
+        self.progress = 0
+        self.speed = 0
+        self.eta_secs = -0
         super(MyLogger, self).__init__()
 
     def _clean_str(self, msg):
@@ -56,6 +62,11 @@ class MyLogger(object):
         save_log_message(self.job_id, f'ERR {self._clean_str(msg)}')
         # app.logger.error(msg)
 
+    def progress_hook(self, dl_dict):
+        # See https://github.com/ytdl-org/youtube-dl/blob/3e4cedf9e8cd3157df2457df7274d0c842421945/youtube_dl/YoutubeDL.py#L230-L250
+        if dl_dict['status'] == 'finished':
+            pass
+
 
 def make_dirlist(parent):
     # Return a list of Path objects for all directories under parent
@@ -71,7 +82,11 @@ def worker(my_url: str, dest: Path, job_id: str):
     try:
         os.chdir(dest)
         app.logger.debug(f'Destination looks OK, starting job{job_id} on {my_url}')
-        with youtube_dl.YoutubeDL({'logger': MyLogger(job_id)}) as ydl:
+        loggerObject = MyLogger(job_id)
+        ydl_opts = {'logger': MyLogger(job_id),
+                    'progress_hooks': [loggerObject.progress_hook],
+                    'ignoreerrors': True}
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([my_url])
             update_job_status(job_id, 'DONE', 0)
     except OSError as ose:

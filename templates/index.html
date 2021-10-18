@@ -57,6 +57,7 @@
                 <th scope="col">Time</th>
                 <th scope="col">Source URL</th>
                 <th scope="col">Destination</th>
+                <th scope="col">Status</th>
                 <th scope="col">OK?</th>
                 <th scope="col">Job details</th>
             </tr>
@@ -68,6 +69,7 @@
                 <td>{{row["timestamp"]}}</td>
                 <td><a href="{{row['url']}}">{{row["url"]}}</a></td>
                 <td>{{row["dest_dir"]}}</td>
+                <td>{{row["status"]}}</td>
                 <td>{{row["return_code"]}}</td>
                 <td><a href="/job/{{row['job_id']}}">Details</a></td>
             </tr>
