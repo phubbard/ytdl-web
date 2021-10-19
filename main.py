@@ -40,7 +40,7 @@ class MyLogger(object):
         self.job_id = job_id
         self.filename = ''
         self.downloaded_bytes = 0
-        self.total.bytes = 0
+        self.total_bytes = 0
         self.progress = 0
         self.speed = 0
         self.eta_secs = -0
