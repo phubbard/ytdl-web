@@ -1,7 +1,7 @@
 #!/usr/bin/bin/env python3
 # pfh 10/15/2021
 # Data model for updated version - store jobs and logs in sqlite,
-# use separate workers to DL.
+# use separate workers to DL. Trying raw sqlite without an ORM as a learning exercise.
 
 import functools
 import logging
@@ -17,6 +17,8 @@ log = logging.getLogger('model')
 
 
 def _get_db():
+    # Shared / commont routine to open the DB in locked mode - this should block if another
+    # process has it in use. A bit of a hack, but given our low transaction/use rates it works.
     # See https://stackoverflow.com/questions/43691588/python-multiprocessing-write-the-results-in-the-same-file
     conn = sqlite3.connect(DB_PATH, isolation_level="EXCLUSIVE")
     # I want key:value pairs, not a plain tuple
@@ -27,17 +29,18 @@ def _get_db():
 
 
 def db_wrapper(func):
-    # Code reuse for the try/catch code
+    # Code reuse for the try/catch code. Combines DB access and a timer.
+    # N.B. invokes commit every time - atomic but slower.
     @functools.wraps(func)
     def wrapped_func(*args, **kwargs):
+        cursor: None
         conn = cursor = None
 
         try:
             conn, cursor = _get_db()
             start_time = time.perf_counter()
             value = func(*args, **kwargs, cursor=cursor)
-            end_time = time.perf_counter()
-            run_time = end_time - start_time
+            run_time = time.perf_counter() - start_time
             log.debug(f'{func.__name__} in {run_time:.4f} seconds')
             return value
         except sqlite3.Error as e:
@@ -50,10 +53,7 @@ def db_wrapper(func):
 
 @db_wrapper
 def make_database(fake_record=False, cursor=None):
-    # log.warning('Dropping tables')
-    # cursor.execute(f'DROP TABLE {JOB_TABLE}')
-    # cursor.execute(f'DROP TABLE {LOG_TABLE}')
-    log.info('Jobs table')
+    log.info('Creating jobs table')
     cursor.execute(f'''CREATE TABLE {JOB_TABLE}
                     (ID INTEGER PRIMARY KEY AUTOINCREMENT,
                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, 
@@ -62,6 +62,7 @@ def make_database(fake_record=False, cursor=None):
                     job_id text NOT NULL,
                     status text NOT NULL, 
                     return_code INTEGER)''')
+    # TODO Move logs to one file per UUID-named directory... this is overkill
     log.info('Log table')
     cursor.execute(f'''CREATE TABLE {LOG_TABLE}
                     (ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,6 +79,7 @@ def make_database(fake_record=False, cursor=None):
 
 @db_wrapper
 def save_log_message(job_id, message, cursor=None):
+    # TODO append to text file instead of DB
     cursor.execute(f'INSERT INTO {LOG_TABLE} (job_id, message) values ("{job_id}", "{message}")')
 
 
@@ -145,4 +147,3 @@ def get_all_jobs(start: int, limit: int, cursor=None):
     rows = query.fetchall()
     dicts = [dict(x) for x in rows]
     return dicts
-
