@@ -141,4 +141,4 @@ def submit():
 if __name__ == '__main__':
     app.logger.info(f'Configuration: {socket.gethostname()} {dest_vol} {default_dir}')
     app.logger.debug(f'Directories: {make_dirlist(dest_vol)}')
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=5050)
