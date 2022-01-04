@@ -18,6 +18,8 @@ Works as intended, but
 - Utterly insecure - no input validation, so internal-network use only.
 
 ### Next steps
+- Add 'retry' button to failed downloads
+- Try yt-dlp library to fix speed limiting
 - Add pagination to index table
 - Add intelligence to log display - collapse the middle if too long (accordion maybe)
 - Widen margins on log display

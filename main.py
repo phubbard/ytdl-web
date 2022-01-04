@@ -21,6 +21,7 @@ app.logger.setLevel(logging.DEBUG)
 
 
 class MyLogger(object):
+    # Callback hook class - ytdl library calls into this class, event driven
     # Save job id for sqlite logger
     def __init__(self, job_id):
         self.job_id = job_id
@@ -59,7 +60,8 @@ class MyLogger(object):
 
 
 def make_dirlist(parent):
-    # Return a list of Path objects for all directories under parent
+    # Return a list of Path objects for all directories under parent. Used to
+    # create a list of destination directories.
     all_things = Path(parent)
     all_dirs = [x.name for x in all_things.iterdir() if x.is_dir()]
     # Remove any directories with names starting with a dot
@@ -67,6 +69,7 @@ def make_dirlist(parent):
     return sorted(filtered_dirs)
 
 
+# Worker process - single download job
 # TODO poll the DB for other new jobs
 def worker(my_url: str, dest: Path, job_id: str):
     cur_dir = os.getcwd()
@@ -81,6 +84,7 @@ def worker(my_url: str, dest: Path, job_id: str):
             ydl.download([my_url])
             update_job_status(job_id, 'DONE', 0)
     except OSError as ose:
+        # This doesn't catch a lot of failed downloads. FIXME.
         app.logger.exception(ose)
         update_job_status(job_id, 'DONE', -1)
     finally:
@@ -88,10 +92,9 @@ def worker(my_url: str, dest: Path, job_id: str):
     app.logger.info(f"Worker done with {my_url}")
 
 
-# Display the to-be-downloaded page
+# Display the to-be-downloaded page (index)
 @app.route('/', methods=['GET'])
 def index():
-    # TODO add job list with clickable links
     job_list = get_all_jobs(0, 20)
     return render_template('index.html', dirs=make_dirlist(DEST_VOL), default_dir=DEFAULT_DIR, job_list=job_list)
 
@@ -123,6 +126,21 @@ def submit():
     save_new_job(job_id, url, dest_dir)
     update_job_status(job_id, 'RUNNING', 0)
     p = Process(target=worker, args=(url, dest_path, job_id))
+    p.start()
+    # send to new in-process page, job_id as key
+    return redirect(f'/job/{job_id}')
+
+
+@app.route('/retry/<job_id>', methods=['POST'])
+def retry(job_id):
+    job_info = get_job(job_id)
+    if job_info is None:
+        return make_response(f'Job {job_id} not found', 404)
+
+    url = job_info['url']
+    dest_dir = job_info['dest_dir']
+    update_job_status(job_id, 'RUNNING', 0)
+    p = Process(target=worker, args=(url, dest_dir, job_id))
     p.start()
     # send to new in-process page, job_id as key
     return redirect(f'/job/{job_id}')
