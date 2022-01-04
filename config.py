@@ -4,6 +4,7 @@
 from __future__ import unicode_literals
 from configparser import ConfigParser
 import logging
+import os
 from pathlib import Path
 import socket
 import sys
@@ -21,7 +22,7 @@ try:
     DEFAULT_DIR = config[hostname]['dest_default']
     DB_DIR = config[hostname]['db_dir']
 except KeyError:
-    log.fatal(f"Add a {socket.gethostname()} section in config.ini")
+    log.fatal(f"Unable to to find {socket.gethostname()} section in config.ini in {os.getcwd()}")
     sys.exit(1)
 
 DB_NAME = "ytdl.sqlite"
