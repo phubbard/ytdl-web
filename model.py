@@ -78,9 +78,11 @@ def make_database(fake_record=False, cursor=None):
 
 
 @db_wrapper
-def save_log_message(job_id, message, cursor=None):
+def save_log_message(job_id: str, message:str, cursor=None):
     # TODO append to text file instead of DB
-    cursor.execute(f'INSERT INTO {LOG_TABLE} (job_id, message) values ("{job_id}", "{message}")')
+    # Some messages barf, SO isn't helping, let's try some manual filtering
+    filtered_string = message.replace("'", "")
+    cursor.execute(f'INSERT INTO {LOG_TABLE} (job_id, message) values ("{job_id}", "{filtered_string}")')
 
 
 @db_wrapper
