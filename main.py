@@ -7,7 +7,7 @@ import socket
 from uuid import uuid4
 
 from flask import Flask, request, render_template, url_for, redirect, make_response
-import youtube_dl
+import yt_dlp
 
 from config import DEST_VOL, DEFAULT_DIR
 from model import save_log_message, get_job, get_job_logs, \
@@ -80,7 +80,7 @@ def worker(my_url: str, dest: Path, job_id: str):
         ydl_opts = {'logger': MyLogger(job_id),
                     'progress_hooks': [log_object.progress_hook],
                     "ignoreerrors": True}
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([my_url])
             update_job_status(job_id, 'DONE', 0)
     except OSError as ose:
@@ -147,6 +147,6 @@ def retry(job_id):
 
 
 if __name__ == '__main__':
-    app.logger.info(f'Configuration: {socket.gethostname()} {dest_vol} {default_dir}')
-    app.logger.debug(f'Directories: {make_dirlist(dest_vol)}')
+    app.logger.info(f'Configuration: {socket.gethostname()} {DEST_VOL} {DEFAULT_DIR}')
+    app.logger.debug(f'Directories: {make_dirlist(DEST_VOL)}')
     app.run(debug=True, host='0.0.0.0', port=5050)

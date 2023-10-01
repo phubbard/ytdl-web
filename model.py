@@ -17,7 +17,7 @@ log = logging.getLogger('model')
 
 
 def _get_db():
-    # Shared / commont routine to open the DB in locked mode - this should block if another
+    # Shared / common routine to open the DB in locked mode - this should block if another
     # process has it in use. A bit of a hack, but given our low transaction/use rates it works.
     # See https://stackoverflow.com/questions/43691588/python-multiprocessing-write-the-results-in-the-same-file
     conn = sqlite3.connect(DB_PATH, isolation_level="EXCLUSIVE")
@@ -41,7 +41,7 @@ def db_wrapper(func):
             start_time = time.perf_counter()
             value = func(*args, **kwargs, cursor=cursor)
             run_time = time.perf_counter() - start_time
-            log.debug(f'{func.__name__} in {run_time:.4f} seconds')
+            # log.debug(f'{func.__name__} in {run_time:.4f} seconds')
             return value
         except sqlite3.Error as e:
             log.exception(e)
