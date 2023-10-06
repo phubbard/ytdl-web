@@ -95,7 +95,7 @@ def save_new_job(job_id: str, url: str, dest_dir: str, cursor=None):
 def update_job_status(job_id: str, status: str, return_code: int, cursor=None):
     assert(status in JOB_STATES)
     log.info(f'Updating job record {job_id} to {status} rc={return_code}')
-    cursor.execute(f'''UPDATE {JOB_TABLE} 
+    cursor.execute(f'''UPDATE f{JOB_TABLE} 
                     SET status=?,
                     return_code=? 
                     WHERE job_id="{job_id}"''',

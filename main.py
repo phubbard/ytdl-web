@@ -6,7 +6,7 @@ from pathlib import Path
 import socket
 from uuid import uuid4
 
-from flask import Flask, request, render_template, url_for, redirect, make_response
+from flask import Flask, request, render_template, url_for, redirect, make_response, abort
 import yt_dlp
 
 from config import DEST_VOL, DEFAULT_DIR
@@ -120,7 +120,12 @@ def poll_job(job_id):
 def submit():
     job_id = uuid4().hex
     url = request.form['vidlink']
+    # Validate the dest is in the list provided
+    dirs = make_dirlist(DEST_VOL)
     dest_dir = request.form['destination']
+    if dest_dir not in dirs:
+       app.logger.error(f'Attempted to save to invalid directory "{dest_dir}"')
+       abort(400, 'Invalid directory')
     dest_path = Path(DEST_VOL, dest_dir)
     # Save to DB
     save_new_job(job_id, url, dest_dir)
@@ -130,7 +135,7 @@ def submit():
     # send to new in-process page, job_id as key
     return redirect(f'/job/{job_id}')
 
-
+# FIXME
 @app.route('/retry/<job_id>', methods=['POST'])
 def retry(job_id):
     job_info = get_job(job_id)
