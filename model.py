@@ -58,6 +58,7 @@ def make_database(fake_record=False, cursor=None):
                     (ID INTEGER PRIMARY KEY AUTOINCREMENT,
                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, 
                     url text NOT NULL, 
+                    title text NOT NULL,
                     dest_dir text NOT NULL, 
                     job_id text NOT NULL,
                     status text NOT NULL, 
@@ -73,8 +74,8 @@ def make_database(fake_record=False, cursor=None):
 
     if fake_record:
         log.info('Creating fake record')
-        cursor.execute(f'''INSERT INTO {JOB_TABLE} (url, dest_dir, job_id, status, return_code) values 
-            ("https://google.com/", "/tmp", "{uuid4().hex}", "NEW", 0)''')
+        cursor.execute(f'''INSERT INTO {JOB_TABLE} (url, title, dest_dir, job_id, status, return_code) values 
+            ("https://google.com/", "None", "/tmp", "{uuid4().hex}", "NEW", 0)''')
 
 
 @db_wrapper
@@ -86,16 +87,16 @@ def save_log_message(job_id: str, message:str, cursor=None):
 
 
 @db_wrapper
-def save_new_job(job_id: str, url: str, dest_dir: str, cursor=None):
-    cursor.execute(f'INSERT INTO {JOB_TABLE} (url, dest_dir, job_id, status) values (?,?,?,?)',
-                   (url, dest_dir, job_id, "NEW"))
+def save_new_job(job_id: str, url: str, title: str, dest_dir: str, cursor=None):
+    cursor.execute(f'INSERT INTO {JOB_TABLE} (url, title, dest_dir, job_id, status) values (?,?,?,?,?)',
+                   (url, title, dest_dir, job_id, "NEW"))
 
 
 @db_wrapper
 def update_job_status(job_id: str, status: str, return_code: int, cursor=None):
     assert(status in JOB_STATES)
     log.info(f'Updating job record {job_id} to {status} rc={return_code}')
-    cursor.execute(f'''UPDATE f{JOB_TABLE} 
+    cursor.execute(f'''UPDATE {JOB_TABLE} 
                     SET status=?,
                     return_code=? 
                     WHERE job_id="{job_id}"''',

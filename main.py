@@ -107,13 +107,14 @@ def poll_job(job_id):
         return make_response(f'Job {job_id} not found', 404)
 
     url = job_info['url']
+    video_title = job_info['title']
     status = job_info['status']
     dest_dir = job_info['dest_dir']
     job_logs = get_job_logs(job_id)
     restart_url = url_for('index')
     return render_template('job.html', job_logs=job_logs,
                            url=url, status=status, dest_dir=dest_dir,
-                           restart_url=restart_url)
+                           restart_url=restart_url, video_title=video_title)
 
 
 @app.route('/submit', methods=['POST'])
@@ -127,16 +128,27 @@ def submit():
        app.logger.error(f'Attempted to save to invalid directory "{dest_dir}"')
        abort(400, 'Invalid directory')
     dest_path = Path(DEST_VOL, dest_dir)
+
+    # To get the title, we have to make a call.
+    app.logger.info('Retrieving metadata...')
+    y = yt_dlp.YoutubeDL()
+    info = y.extract_info(url, download=False)
+    if 'title' in info.keys():
+        title = info['title']
+        app.logger.debug(f"Got title {title} for {url}")
+    else:
+        app.logger.info(f'No title found for {url}')
+        title = 'None'
     # Save to DB
-    save_new_job(job_id, url, dest_dir)
+    save_new_job(job_id, url, title, dest_dir)
     update_job_status(job_id, 'RUNNING', 0)
     p = Process(target=worker, args=(url, dest_path, job_id))
     p.start()
     # send to new in-process page, job_id as key
     return redirect(f'/job/{job_id}')
 
-# FIXME
-@app.route('/retry/<job_id>', methods=['POST'])
+
+@app.route('/retry/<job_id>', methods=['GET'])
 def retry(job_id):
     job_info = get_job(job_id)
     if job_info is None:
